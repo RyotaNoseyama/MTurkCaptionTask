@@ -1,0 +1,157 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Instructions } from '@/components/task/instructions';
+import { ImageDisplay } from '@/components/task/image-display';
+import { CaptionForm } from '@/components/task/caption-form';
+import { FeedbackPanel } from '@/components/task/feedback-panel';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { HistogramData, GoalData } from '@/lib/feedback-data';
+
+interface FeedbackDataResponse {
+  histogram: HistogramData;
+  goal: GoalData;
+}
+
+export function TaskPageContent() {
+  const searchParams = useSearchParams();
+  const [feedbackData, setFeedbackData] = useState<FeedbackDataResponse | null>(null);
+  const [completionCode, setCompletionCode] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const workerId = searchParams.get('workerId') || '';
+  const assignmentId = searchParams.get('assignmentId') || '';
+  const hitId = searchParams.get('hitId') || '';
+  const turkSubmitTo = searchParams.get('turkSubmitTo') || '';
+  const isPreview = assignmentId === 'ASSIGNMENT_ID_NOT_AVAILABLE';
+  const imageUrl = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || '';
+
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        const response = await fetch(`/api/feedback?workerId=${workerId}`);
+        const data = await response.json();
+        setFeedbackData(data);
+      } catch (err) {
+        console.error('Failed to load feedback:', err);
+      }
+    };
+
+    if (workerId) {
+      fetchFeedback();
+    }
+  }, [workerId]);
+
+  const handleSubmit = async (captions: { a: string; b: string }, rtMs: number) => {
+    setError(null);
+    try {
+      const response = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workerId,
+          assignmentId,
+          hitId,
+          captions,
+          rtMs,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Submission failed');
+        return;
+      }
+
+      setCompletionCode(data.completionCode);
+      setHasSubmitted(true);
+    } catch (err) {
+      setError('Network error. Please try again.');
+    }
+  };
+
+  if (!workerId) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <Alert className="max-w-md border-amber-200 bg-amber-50">
+          <AlertCircle className="h-5 w-5 text-amber-600" />
+          <AlertDescription className="text-amber-900">
+            Invalid task URL. Please access this task from Amazon Mechanical Turk.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (hasSubmitted && completionCode) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <Card className="max-w-md border-green-200 bg-green-50">
+          <CardContent className="pt-6 text-center space-y-4">
+            <CheckCircle className="mx-auto h-16 w-16 text-green-600" />
+            <h2 className="text-2xl font-semibold text-slate-900">Thank You!</h2>
+            <p className="text-slate-700 leading-relaxed">
+              Your captions have been submitted successfully.
+            </p>
+            <div className="bg-white border border-slate-200 rounded-lg p-4">
+              <p className="text-sm text-slate-600 mb-2">Your completion code:</p>
+              <p className="text-xl font-mono font-bold text-slate-900">{completionCode}</p>
+            </div>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Return to MTurk and press <strong>Submit</strong> to complete this HIT.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Image Caption Task</h1>
+          <p className="text-slate-600">Write two detailed captions for the image below</p>
+        </div>
+
+        {isPreview && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <AlertCircle className="h-5 w-5 text-blue-600" />
+            <AlertDescription className="text-blue-900">
+              Preview mode. Accept this HIT on MTurk to start the task.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {error && (
+          <Alert className="mb-6 border-red-200 bg-red-50">
+            <AlertCircle className="h-5 w-5 text-red-600" />
+            <AlertDescription className="text-red-900">{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Instructions />
+            <ImageDisplay imageUrl={imageUrl} />
+            <CaptionForm onSubmit={handleSubmit} disabled={isPreview} />
+          </div>
+
+          <div className="lg:col-span-1">
+            {feedbackData && (
+              <FeedbackPanel
+                histogram={feedbackData.histogram}
+                goal={feedbackData.goal}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
