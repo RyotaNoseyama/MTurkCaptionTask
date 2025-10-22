@@ -4,9 +4,9 @@
 function tokenizeWords(text) {
   return text
     .toLowerCase()
-    .replace(/[^\w\s]/g, '') // 句読点を除去
+    .replace(/[^\w\s]/g, "") // 句読点を除去
     .split(/\s+/)
-    .filter(word => word.length > 0);
+    .filter((word) => word.length > 0);
 }
 
 // 単語レベルでのLevenshtein距離を計算する関数
@@ -48,7 +48,7 @@ function wordLevenshteinDistance(words1, words2) {
 // WERベースの類似度を計算する関数
 function calculateWERSimilarity(text1, text2) {
   if (text1 === text2) return 1;
-  
+
   const words1 = tokenizeWords(text1);
   const words2 = tokenizeWords(text2);
 
@@ -76,25 +76,37 @@ console.log("=== WER類似度計算テスト ===");
 
 // 基本的なテスト
 console.log("完全一致:", calculateWERSimilarity("hello world", "hello world")); // 1.0
-console.log("単語追加:", calculateWERSimilarity("hello world", "hello beautiful world")); // 約0.67
+console.log(
+  "単語追加:",
+  calculateWERSimilarity("hello world", "hello beautiful world")
+); // 約0.67
 console.log("単語置換:", calculateWERSimilarity("hello world", "hello earth")); // 0.5
-console.log("全く違う:", calculateWERSimilarity("hello world", "goodbye universe")); // 0.0
+console.log(
+  "全く違う:",
+  calculateWERSimilarity("hello world", "goodbye universe")
+); // 0.0
 
 // キャプションテスト
 const captions1 = {
   a: "A beautiful sunset over the ocean",
-  b: "The waves crash against the shore"
+  b: "The waves crash against the shore",
 };
 
 const captions2 = {
   a: "A beautiful sunset over the ocean with colors",
-  b: "The waves gently crash against the shore"
+  b: "The waves gently crash against the shore",
 };
 
 const captions3 = {
   a: "A cat sitting on a windowsill",
-  b: "The dog runs in the park"
+  b: "The dog runs in the park",
 };
 
-console.log("類似キャプション:", checkCaptionSimilarityWER(captions1, captions2));
-console.log("異なるキャプション:", checkCaptionSimilarityWER(captions1, captions3));
+console.log(
+  "類似キャプション:",
+  checkCaptionSimilarityWER(captions1, captions2)
+);
+console.log(
+  "異なるキャプション:",
+  checkCaptionSimilarityWER(captions1, captions3)
+);

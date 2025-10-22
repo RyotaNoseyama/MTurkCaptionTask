@@ -9,9 +9,9 @@
 function tokenizeWords(text: string): string[] {
   return text
     .toLowerCase()
-    .replace(/[^\w\s]/g, '') // 句読点を除去
+    .replace(/[^\w\s]/g, "") // 句読点を除去
     .split(/\s+/)
-    .filter(word => word.length > 0);
+    .filter((word) => word.length > 0);
 }
 
 /**
@@ -76,7 +76,7 @@ export function calculateWER(text1: string, text2: string): number {
  */
 export function calculateWERSimilarity(text1: string, text2: string): number {
   if (text1 === text2) return 1;
-  
+
   const wer = calculateWER(text1, text2);
   return 1 - wer;
 }
