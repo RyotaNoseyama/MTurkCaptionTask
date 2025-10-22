@@ -3,7 +3,6 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Instructions } from "@/components/task/instructions";
-import { ImageDisplay } from "@/components/task/image-display";
 import { CaptionForm } from "@/components/task/caption-form";
 import { FeedbackPanel } from "@/components/task/feedback-panel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +30,8 @@ export function TaskPageContent() {
   const hitId = searchParams.get("hitId") || "";
   const turkSubmitTo = searchParams.get("turkSubmitTo") || "";
   const isPreview = assignmentId === "ASSIGNMENT_ID_NOT_AVAILABLE";
-  const imageUrl = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || "";
+  const imageUrlA = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_A || process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || "";
+  const imageUrlB = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_B || process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || "";
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -170,7 +170,7 @@ export function TaskPageContent() {
             Image Caption Task
           </h1>
           <p className="text-slate-600">
-            Write two detailed captions for the image below
+            Write detailed captions for the two images below
           </p>
         </div>
 
@@ -195,8 +195,12 @@ export function TaskPageContent() {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Instructions />
-            <ImageDisplay imageUrl={imageUrl} />
-            <CaptionForm onSubmit={handleSubmit} disabled={isPreview} />
+            <CaptionForm 
+              onSubmit={handleSubmit} 
+              disabled={isPreview} 
+              imageUrlA={imageUrlA}
+              imageUrlB={imageUrlB}
+            />
           </div>
 
           <div className="lg:col-span-1">

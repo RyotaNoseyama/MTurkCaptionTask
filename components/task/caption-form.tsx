@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { ImageDisplay } from "./image-display";
 import {
   countNonWhitespaceCharacters,
   isValidNonWhitespaceLength,
@@ -13,12 +14,14 @@ import {
 interface CaptionFormProps {
   onSubmit: (captions: { a: string; b: string }, rtMs: number) => Promise<void>;
   disabled?: boolean;
+  imageUrlA?: string;
+  imageUrlB?: string;
 }
 
 const MIN_LENGTH = 30;
 const MAX_LENGTH = 1000;
 
-export function CaptionForm({ onSubmit, disabled }: CaptionFormProps) {
+export function CaptionForm({ onSubmit, disabled, imageUrlA, imageUrlB }: CaptionFormProps) {
   const [captionA, setCaptionA] = useState("");
   const [captionB, setCaptionB] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -76,6 +79,14 @@ export function CaptionForm({ onSubmit, disabled }: CaptionFormProps) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* 画像表示エリアA */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">
+              Image A
+            </Label>
+            <ImageDisplay imageUrl={imageUrlA} />
+          </div>
+
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label
@@ -97,7 +108,7 @@ export function CaptionForm({ onSubmit, disabled }: CaptionFormProps) {
               value={captionA}
               onChange={(e) => setCaptionA(e.target.value)}
               onBlur={handleCaptionABlur}
-              placeholder="Write a detailed description of the image..."
+              placeholder="Write a detailed description of Image A..."
               className={`min-h-[120px] resize-none focus:ring-slate-400 ${
                 isTooShort(captionA)
                   ? "border-red-400 focus:border-red-500"
@@ -112,6 +123,14 @@ export function CaptionForm({ onSubmit, disabled }: CaptionFormProps) {
                 spaces). Current: {countNonWhitespaceCharacters(captionA)}
               </p>
             )}
+          </div>
+
+          {/* 画像表示エリアB */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium text-slate-700">
+              Image B
+            </Label>
+            <ImageDisplay imageUrl={imageUrlB} />
           </div>
 
           <div className="space-y-2">
@@ -135,7 +154,7 @@ export function CaptionForm({ onSubmit, disabled }: CaptionFormProps) {
               value={captionB}
               onChange={(e) => setCaptionB(e.target.value)}
               onBlur={handleCaptionBBlur}
-              placeholder="Write a second detailed description of the image..."
+              placeholder="Write a detailed description of Image B..."
               className={`min-h-[120px] resize-none focus:ring-slate-400 ${
                 isTooShort(captionB)
                   ? "border-red-400 focus:border-red-500"
