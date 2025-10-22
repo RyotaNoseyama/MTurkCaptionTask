@@ -33,11 +33,14 @@ model Submission {
   dayIdx      Int      @map("day_idx")
   captionA    String   @map("caption_a")
   captionB    String   @map("caption_b")
+  scoreA      Int?     @map("score_a")
+  scoreB      Int?     @map("score_b")
+  score       Int?
   rtMs        Int?     @map("rt_ms")
   submittedAt DateTime @default(now()) @map("submitted_at")
 
   participant Participant @relation(fields: [workerId], references: [workerId])
-  score       Score?
+  scoreRelation Score?   @relation("SubmissionScore")
 
   @@unique([workerId, dayIdx])
   @@map("submissions")
@@ -52,8 +55,18 @@ model Score {
   scoredAt      DateTime @default(now()) @map("scored_at")
   scorer        String?
 
-  submission    Submission @relation(fields: [submissionId], references: [id])
+  submission    Submission @relation("SubmissionScore", fields: [submissionId], references: [id])
   participant   Participant @relation("ParticipantScores", fields: [workerId], references: [workerId])
 
   @@map("scores")
+}
+
+model GroupGoal {
+  id        String   @id @default(cuid())
+  dayIdx    Int      @unique @map("day_idx")
+  count     Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("group_goals")
 }
