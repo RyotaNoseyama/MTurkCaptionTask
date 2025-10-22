@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentDayIdx, generateCompletionCode } from "@/lib/date-utils";
-import { checkCaptionSimilarity } from "@/lib/similarity";
+import { checkCaptionSimilarityWER } from "@/lib/wer-similarity";
 import { isValidNonWhitespaceLength } from "@/lib/text-utils";
 
 const MIN_LENGTH = 30;
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     // 新しいキャプションと既存のキャプションの類似度をチェック
     let isSimilar = false;
     for (const existingSubmission of todaySubmissions) {
-      const similarity = checkCaptionSimilarity(
+      const similarity = checkCaptionSimilarityWER(
         { a: captionA, b: captionB },
         { a: existingSubmission.captionA, b: existingSubmission.captionB }
       );
