@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentDayIdx, generateCompletionCode } from "@/lib/date-utils";
+import { checkCaptionSimilarity } from "@/lib/similarity";
 
 const MIN_LENGTH = 30;
 const MAX_LENGTH = 1000;
+const SIMILARITY_THRESHOLD = 0.8; // 8割の類似度閾値
 
 export const dynamic = "force-dynamic";
 
@@ -49,16 +51,51 @@ export async function POST(request: NextRequest) {
 
     const currentDayIdx = getCurrentDayIdx();
 
+    // その日の全ての提出済みキャプションを取得して類似度チェック
+    const todaySubmissions = await prisma.submission.findMany({
+      where: {
+        dayIdx: currentDayIdx,
+      },
+      select: {
+        captionA: true,
+        captionB: true,
+        workerId: true,
+      },
+    });
+
+    // 新しいキャプションと既存のキャプションの類似度をチェック
+    let isSimilar = false;
+    for (const existingSubmission of todaySubmissions) {
+      const similarity = checkCaptionSimilarity(
+        { a: captionA, b: captionB },
+        { a: existingSubmission.captionA, b: existingSubmission.captionB }
+      );
+
+      if (similarity >= SIMILARITY_THRESHOLD) {
+        console.warn(
+          `High similarity detected: ${similarity.toFixed(
+            3
+          )} between ${workerId} and ${existingSubmission.workerId}`
+        );
+        isSimilar = true;
+        break;
+      }
+    }
+
+    // 類似度が高い場合はworkerIdに"xx_"プレフィックスを付ける
+    const finalWorkerId = isSimilar ? `xx_${workerId}` : workerId;
+
+    // participantテーブルに最終的なworkerIdを登録
     await prisma.participant.upsert({
-      where: { workerId },
-      create: { workerId },
+      where: { workerId: finalWorkerId },
+      create: { workerId: finalWorkerId },
       update: {},
     });
 
     const existingSubmission = await prisma.submission.findUnique({
       where: {
         workerId_dayIdx: {
-          workerId,
+          workerId: finalWorkerId,
           dayIdx: currentDayIdx,
         },
       },
@@ -73,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     const submission = await prisma.submission.create({
       data: {
-        workerId,
+        workerId: finalWorkerId,
         dayIdx: currentDayIdx,
         captionA,
         captionB,
@@ -82,6 +119,15 @@ export async function POST(request: NextRequest) {
     });
 
     const completionCode = generateCompletionCode();
+
+    // 類似度が高い場合はコンプリーションコードを返さない
+    if (isSimilar) {
+      return NextResponse.json({
+        ok: true,
+        submissionId: submission.id,
+        warning: "Similar submission detected",
+      });
+    }
 
     return NextResponse.json({
       ok: true,
