@@ -21,7 +21,12 @@ interface CaptionFormProps {
 const MIN_LENGTH = 30;
 const MAX_LENGTH = 1000;
 
-export function CaptionForm({ onSubmit, disabled, imageUrlA, imageUrlB }: CaptionFormProps) {
+export function CaptionForm({
+  onSubmit,
+  disabled,
+  imageUrlA,
+  imageUrlB,
+}: CaptionFormProps) {
   const [captionA, setCaptionA] = useState("");
   const [captionB, setCaptionB] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

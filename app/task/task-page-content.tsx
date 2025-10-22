@@ -30,8 +30,14 @@ export function TaskPageContent() {
   const hitId = searchParams.get("hitId") || "";
   const turkSubmitTo = searchParams.get("turkSubmitTo") || "";
   const isPreview = assignmentId === "ASSIGNMENT_ID_NOT_AVAILABLE";
-  const imageUrlA = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_A || process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || "";
-  const imageUrlB = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_B || process.env.NEXT_PUBLIC_TODAY_IMAGE_URL || "";
+  const imageUrlA =
+    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_A ||
+    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL ||
+    "";
+  const imageUrlB =
+    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_B ||
+    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL ||
+    "";
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -195,9 +201,9 @@ export function TaskPageContent() {
         <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <Instructions />
-            <CaptionForm 
-              onSubmit={handleSubmit} 
-              disabled={isPreview} 
+            <CaptionForm
+              onSubmit={handleSubmit}
+              disabled={isPreview}
               imageUrlA={imageUrlA}
               imageUrlB={imageUrlB}
             />
