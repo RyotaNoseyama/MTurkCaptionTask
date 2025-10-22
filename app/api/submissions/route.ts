@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentDayIdx, generateCompletionCode } from "@/lib/date-utils";
 import { checkCaptionSimilarity } from "@/lib/similarity";
+import { isValidNonWhitespaceLength } from "@/lib/text-utils";
 
 const MIN_LENGTH = 30;
 const MAX_LENGTH = 1000;
@@ -31,19 +32,19 @@ export async function POST(request: NextRequest) {
     const captionA = captions.a.trim();
     const captionB = captions.b.trim();
 
-    if (captionA.length < MIN_LENGTH || captionA.length > MAX_LENGTH) {
+    if (!isValidNonWhitespaceLength(captionA, MIN_LENGTH, MAX_LENGTH)) {
       return NextResponse.json(
         {
-          error: `Caption A must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters`,
+          error: `Caption A must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters (excluding spaces)`,
         },
         { status: 400 }
       );
     }
 
-    if (captionB.length < MIN_LENGTH || captionB.length > MAX_LENGTH) {
+    if (!isValidNonWhitespaceLength(captionB, MIN_LENGTH, MAX_LENGTH)) {
       return NextResponse.json(
         {
-          error: `Caption B must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters`,
+          error: `Caption B must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters (excluding spaces)`,
         },
         { status: 400 }
       );
