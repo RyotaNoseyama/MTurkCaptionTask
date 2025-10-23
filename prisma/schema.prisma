@@ -22,7 +22,7 @@ model Participant {
 model Day {
   id       String   @id @default(cuid())
   idx      Int      @unique
-  dateJst  DateTime @map("date_jst")
+  dateEt   DateTime @map("date_et")
 
   @@map("days")
 }

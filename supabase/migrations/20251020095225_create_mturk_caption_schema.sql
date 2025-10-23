@@ -11,7 +11,7 @@
     - `days`
       - `id` (text, primary key) - CUID identifier
       - `idx` (int, unique) - Sequential day index
-      - `date_jst` (timestamptz) - JST midnight for this day
+      - `date_et` (timestamptz) - ET midnight for this day
     
     - `submissions`
       - `id` (text, primary key) - CUID identifier
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS participants (
 CREATE TABLE IF NOT EXISTS days (
   id text PRIMARY KEY,
   idx int UNIQUE NOT NULL,
-  date_jst timestamptz NOT NULL
+  date_et timestamptz NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS submissions (
