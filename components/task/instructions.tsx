@@ -10,11 +10,11 @@ export function Instructions() {
       </CardHeader>
       <CardContent className="space-y-2 text-slate-700 leading-relaxed">
         <p>
-          Write <strong>two descriptive long captions</strong> (A and B) for the
-          image below.
+          Write <strong>one descriptive long caption</strong> for the image
+          below.
         </p>
         <p>
-          Each caption must be{" "}
+          The caption must be{" "}
           <strong>at least 30 characters (excluding spaces)</strong>.
         </p>
         <p>Avoid personal data and offensive language.</p>

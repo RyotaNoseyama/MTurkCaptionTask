@@ -31,10 +31,7 @@ model Submission {
   id          String   @id @default(cuid())
   workerId    String   @map("worker_id")
   dayIdx      Int      @map("day_idx")
-  captionA    String   @map("caption_a")
-  captionB    String   @map("caption_b")
-  scoreA      Int?     @map("score_a")
-  scoreB      Int?     @map("score_b")
+  caption     String   @map("caption")
   score       Int?
   rtMs        Int?     @map("rt_ms")
   submittedAt DateTime @default(now()) @map("submitted_at")

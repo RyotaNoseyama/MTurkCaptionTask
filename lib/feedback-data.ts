@@ -54,16 +54,16 @@ export async function getYesterdayGoalProgress(): Promise<GoalData> {
   const target = parseInt(process.env.GOAL_TARGET || "50", 10);
   const threshold = parseInt(process.env.GOAL_THRESHOLD || "7", 10);
 
-  // submissionsテーブルから前日まで（当日は含まない）のscoreAとscoreBをそれぞれ独立してカウント
+  // submissionsテーブルから前日まで（当日は含まない）のscoreをカウント
   const result = await prisma.$queryRaw<{ count: bigint }[]>`
-    SELECT 
-      (CASE WHEN sub.score_a IS NOT NULL AND sub.score_a >= ${threshold} THEN 1 ELSE 0 END) +
-      (CASE WHEN sub.score_b IS NOT NULL AND sub.score_b >= ${threshold} THEN 1 ELSE 0 END) as count
+    SELECT COUNT(*) as count
     FROM submissions sub
-    WHERE sub.day_idx < ${todayIdx}
+    WHERE sub.day_idx < ${todayIdx} 
+      AND sub.score IS NOT NULL 
+      AND sub.score >= ${threshold}
   `;
 
-  const current = result.reduce((total, row) => total + Number(row.count), 0);
+  const current = result.length > 0 ? Number(result[0].count) : 0;
 
   return { current, target, threshold };
 }

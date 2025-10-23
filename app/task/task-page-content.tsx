@@ -30,14 +30,7 @@ export function TaskPageContent() {
   const hitId = searchParams.get("hitId") || "";
   const turkSubmitTo = searchParams.get("turkSubmitTo") || "";
   const isPreview = assignmentId === "ASSIGNMENT_ID_NOT_AVAILABLE";
-  const imageUrlA =
-    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_A ||
-    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL ||
-    "";
-  const imageUrlB =
-    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_B ||
-    process.env.NEXT_PUBLIC_TODAY_IMAGE_URL ||
-    "";
+  const imageUrl = process.env.NEXT_PUBLIC_TODAY_IMAGE_URL_A || "";
 
   useEffect(() => {
     const fetchFeedback = async () => {
@@ -55,10 +48,7 @@ export function TaskPageContent() {
     }
   }, [workerId]);
 
-  const handleSubmit = async (
-    captions: { a: string; b: string },
-    rtMs: number
-  ) => {
+  const handleSubmit = async (caption: string, rtMs: number) => {
     setError(null);
     setWarning(null);
     try {
@@ -69,7 +59,7 @@ export function TaskPageContent() {
           workerId,
           assignmentId,
           hitId,
-          captions,
+          caption,
           rtMs,
         }),
       });
@@ -130,7 +120,7 @@ export function TaskPageContent() {
               </p>
             </div>
             <p className="text-sm text-slate-600 leading-relaxed">
-              Please ensure your captions are original and unique.
+              Please ensure your caption is original and unique.
             </p>
           </CardContent>
         </Card>
@@ -148,7 +138,7 @@ export function TaskPageContent() {
               Thank You!
             </h2>
             <p className="text-slate-700 leading-relaxed">
-              Your captions have been submitted successfully.
+              Your caption has been submitted successfully.
             </p>
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-2">
@@ -176,7 +166,7 @@ export function TaskPageContent() {
             Image Caption Task
           </h1>
           <p className="text-slate-600">
-            Write detailed captions for the two images below
+            Write a detailed caption for the image below
           </p>
         </div>
 
@@ -204,8 +194,7 @@ export function TaskPageContent() {
             <CaptionForm
               onSubmit={handleSubmit}
               disabled={isPreview}
-              imageUrlA={imageUrlA}
-              imageUrlB={imageUrlB}
+              imageUrl={imageUrl}
             />
           </div>
 

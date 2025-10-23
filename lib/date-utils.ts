@@ -74,5 +74,10 @@ export function generateCompletionCode(): string {
       return segment;
     })
     .join("-");
-  return `COMP-${code}`;
+
+  // 真ん中の文字（7文字目、ハイフンを含めると8文字目）を'R'に固定
+  const codeArray = code.split("");
+  codeArray[6] = "R"; // XXXX-XXRX-XXXX の R
+
+  return `COMP-${codeArray.join("")}`;
 }

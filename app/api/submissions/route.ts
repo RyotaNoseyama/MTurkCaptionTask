@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentDayIdx, generateCompletionCode } from "@/lib/date-utils";
-import { checkCaptionSimilarityWER } from "@/lib/wer-similarity";
+import { calculateWERSimilarity } from "@/lib/wer-similarity";
 import { isValidNonWhitespaceLength } from "@/lib/text-utils";
 
 const MIN_LENGTH = 30;
@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { workerId, assignmentId, hitId, captions, rtMs } = body;
+    const { workerId, assignmentId, hitId, caption, rtMs } = body;
 
     if (assignmentId === "ASSIGNMENT_ID_NOT_AVAILABLE") {
       return NextResponse.json(
@@ -22,29 +22,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!workerId || !captions?.a || !captions?.b) {
+    if (!workerId || !caption) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
-    const captionA = captions.a.trim();
-    const captionB = captions.b.trim();
+    const trimmedCaption = caption.trim();
 
-    if (!isValidNonWhitespaceLength(captionA, MIN_LENGTH, MAX_LENGTH)) {
+    if (!isValidNonWhitespaceLength(trimmedCaption, MIN_LENGTH, MAX_LENGTH)) {
       return NextResponse.json(
         {
-          error: `Caption A must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters (excluding spaces)`,
-        },
-        { status: 400 }
-      );
-    }
-
-    if (!isValidNonWhitespaceLength(captionB, MIN_LENGTH, MAX_LENGTH)) {
-      return NextResponse.json(
-        {
-          error: `Caption B must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters (excluding spaces)`,
+          error: `Caption must be between ${MIN_LENGTH} and ${MAX_LENGTH} characters (excluding spaces)`,
         },
         { status: 400 }
       );
@@ -58,8 +48,7 @@ export async function POST(request: NextRequest) {
         dayIdx: currentDayIdx,
       },
       select: {
-        captionA: true,
-        captionB: true,
+        caption: true,
         workerId: true,
       },
     });
@@ -67,9 +56,9 @@ export async function POST(request: NextRequest) {
     // 新しいキャプションと既存のキャプションの類似度をチェック
     let isSimilar = false;
     for (const existingSubmission of todaySubmissions) {
-      const similarity = checkCaptionSimilarityWER(
-        { a: captionA, b: captionB },
-        { a: existingSubmission.captionA, b: existingSubmission.captionB }
+      const similarity = calculateWERSimilarity(
+        trimmedCaption,
+        existingSubmission.caption
       );
 
       if (similarity >= SIMILARITY_THRESHOLD) {
@@ -113,8 +102,7 @@ export async function POST(request: NextRequest) {
       data: {
         workerId: finalWorkerId,
         dayIdx: currentDayIdx,
-        captionA,
-        captionB,
+        caption: trimmedCaption,
         rtMs: rtMs || null,
       },
     });

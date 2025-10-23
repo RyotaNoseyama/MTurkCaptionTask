@@ -63,13 +63,8 @@ function calculateWERSimilarity(text1, text2) {
 }
 
 // キャプションの類似度をWERでチェックする関数
-function checkCaptionSimilarityWER(captions1, captions2) {
-  const similarities = [
-    calculateWERSimilarity(captions1.a, captions2.a), // A同士
-    calculateWERSimilarity(captions1.b, captions2.b), // B同士
-  ];
-
-  return Math.max(...similarities);
+function checkCaptionSimilarityWER(caption1, caption2) {
+  return calculateWERSimilarity(caption1, caption2);
 }
 
 console.log("=== WER類似度計算テスト ===");
@@ -87,26 +82,12 @@ console.log(
 ); // 0.0
 
 // キャプションテスト
-const captions1 = {
-  a: "A beautiful sunset over the ocean",
-  b: "The waves crash against the shore",
-};
+const caption1 = "A beautiful sunset over the ocean";
+const caption2 = "A beautiful sunset over the ocean with colors";
+const caption3 = "A cat sitting on a windowsill";
 
-const captions2 = {
-  a: "A beautiful sunset over the ocean with colors",
-  b: "The waves gently crash against the shore",
-};
-
-const captions3 = {
-  a: "A cat sitting on a windowsill",
-  b: "The dog runs in the park",
-};
-
-console.log(
-  "類似キャプション:",
-  checkCaptionSimilarityWER(captions1, captions2)
-);
+console.log("類似キャプション:", checkCaptionSimilarityWER(caption1, caption2));
 console.log(
   "異なるキャプション:",
-  checkCaptionSimilarityWER(captions1, captions3)
+  checkCaptionSimilarityWER(caption1, caption3)
 );

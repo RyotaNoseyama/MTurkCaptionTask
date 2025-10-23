@@ -17,8 +17,7 @@
       - `id` (text, primary key) - CUID identifier
       - `worker_id` (text) - Foreign key to participants
       - `day_idx` (int) - Day index when submitted
-      - `caption_a` (text) - First caption
-      - `caption_b` (text) - Second caption
+      - `caption` (text) - Image caption
       - `rt_ms` (int, nullable) - Response time in milliseconds
       - `submitted_at` (timestamptz) - Submission timestamp
       - Unique constraint on (worker_id, day_idx)
@@ -54,8 +53,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   id text PRIMARY KEY,
   worker_id text NOT NULL REFERENCES participants(worker_id),
   day_idx int NOT NULL,
-  caption_a text NOT NULL,
-  caption_b text NOT NULL,
+  caption text NOT NULL,
   rt_ms int,
   submitted_at timestamptz DEFAULT now(),
   UNIQUE(worker_id, day_idx)
