@@ -31,10 +31,11 @@ model Submission {
   id          String   @id @default(cuid())
   workerId    String   @map("worker_id")
   dayIdx      Int      @map("day_idx")
-  caption     String   @map("caption")
+  captionA    String   @map("caption_a")
+  scoreA      Int?     @map("score_a")
   score       Int?
   rtMs        Int?     @map("rt_ms")
-  submittedAt DateTime @default(now()) @map("submitted_at")
+  submittedAt DateTime? @default(now()) @map("submitted_at")
 
   participant Participant @relation(fields: [workerId], references: [workerId])
   scoreRelation Score?   @relation("SubmissionScore")

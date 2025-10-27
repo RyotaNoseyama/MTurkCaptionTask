@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         dayIdx: currentDayIdx,
       },
       select: {
-        caption: true,
+        captionA: true,
         workerId: true,
       },
     });
@@ -56,9 +56,11 @@ export async function POST(request: NextRequest) {
     // 新しいキャプションと既存のキャプションの類似度をチェック
     let isSimilar = false;
     for (const existingSubmission of todaySubmissions) {
+      if (!existingSubmission.captionA) continue;
+
       const similarity = calculateWERSimilarity(
         trimmedCaption,
-        existingSubmission.caption
+        existingSubmission.captionA
       );
 
       if (similarity >= SIMILARITY_THRESHOLD) {
@@ -102,7 +104,7 @@ export async function POST(request: NextRequest) {
       data: {
         workerId: finalWorkerId,
         dayIdx: currentDayIdx,
-        caption: trimmedCaption,
+        captionA: trimmedCaption,
         rtMs: rtMs || null,
       },
     });
