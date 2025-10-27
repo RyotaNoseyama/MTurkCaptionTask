@@ -8,10 +8,11 @@ datasource db {
 }
 
 model Participant {
-  workerId   String   @id @map("worker_id")
-  cond       Int?
-  tz         String?
-  consentAt  DateTime? @map("consent_at")
+  workerId         String   @id @map("worker_id")
+  cond             Int?
+  participantOrder Int?     @map("participant_order")
+  tz               String?
+  consentAt        DateTime? @map("consent_at")
 
   submissions Submission[]
   scores      Score[]  @relation("ParticipantScores")
@@ -28,14 +29,15 @@ model Day {
 }
 
 model Submission {
-  id          String   @id @default(cuid())
-  workerId    String   @map("worker_id")
-  dayIdx      Int      @map("day_idx")
-  captionA    String   @map("caption_a")
-  scoreA      Int?     @map("score_a")
-  score       Int?
-  rtMs        Int?     @map("rt_ms")
-  submittedAt DateTime? @default(now()) @map("submitted_at")
+  id             String   @id @default(cuid())
+  workerId       String   @map("worker_id")
+  dayIdx         Int      @map("day_idx")
+  captionA       String   @map("caption_a")
+  scoreA         Int?     @map("score_a")
+  score          Int?
+  rtMs           Int?     @map("rt_ms")
+  completionCode String?  @map("completion_code")
+  submittedAt    DateTime? @default(now()) @map("submitted_at")
 
   participant Participant @relation(fields: [workerId], references: [workerId])
   scoreRelation Score?   @relation("SubmissionScore")

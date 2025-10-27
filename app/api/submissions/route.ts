@@ -77,12 +77,25 @@ export async function POST(request: NextRequest) {
     // 類似度が高い場合はworkerIdに"xx_"プレフィックスを付ける
     const finalWorkerId = isSimilar ? `xx_${workerId}` : workerId;
 
-    // participantテーブルに最終的なworkerIdを登録
-    await prisma.participant.upsert({
+    // participantテーブルに最終的なworkerIdを登録（グループ分けを含む）
+    let participant = await prisma.participant.findUnique({
       where: { workerId: finalWorkerId },
-      create: { workerId: finalWorkerId },
-      update: {},
     });
+
+    if (!participant) {
+      // 新しい参加者の場合、順序とグループを決定
+      const participantCount = await prisma.participant.count();
+      const newOrder = participantCount + 1;
+      const groupCond = ((newOrder - 1) % 4) + 1; // 1, 2, 3, 4 のグループ
+
+      participant = await prisma.participant.create({
+        data: {
+          workerId: finalWorkerId,
+          participantOrder: newOrder,
+          cond: groupCond,
+        },
+      });
+    }
 
     const existingSubmission = await prisma.submission.findUnique({
       where: {
@@ -100,16 +113,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // コンプリーションコードを生成（類似度が高くない場合のみ）
+    const completionCode = isSimilar ? null : generateCompletionCode();
+
     const submission = await prisma.submission.create({
       data: {
         workerId: finalWorkerId,
         dayIdx: currentDayIdx,
         captionA: trimmedCaption,
         rtMs: rtMs || null,
+        completionCode: completionCode,
       },
     });
-
-    const completionCode = generateCompletionCode();
 
     // 類似度が高い場合はコンプリーションコードを返さない
     if (isSimilar) {
@@ -117,6 +132,10 @@ export async function POST(request: NextRequest) {
         ok: true,
         submissionId: submission.id,
         warning: "Similar submission detected",
+        groupInfo: {
+          cond: participant.cond,
+          participantOrder: participant.participantOrder,
+        },
       });
     }
 
@@ -124,6 +143,10 @@ export async function POST(request: NextRequest) {
       ok: true,
       completionCode,
       submissionId: submission.id,
+      groupInfo: {
+        cond: participant.cond,
+        participantOrder: participant.participantOrder,
+      },
     });
   } catch (error) {
     console.error("Submission error:", error);

@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { HistogramData, GoalData } from "@/lib/feedback-data";
+import { GroupInfo, getGroupMessage } from "@/lib/group-utils";
 
 interface FeedbackDataResponse {
   histogram: HistogramData;
@@ -24,6 +25,7 @@ export function TaskPageContent() {
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [groupInfo, setGroupInfo] = useState<GroupInfo | null>(null);
 
   const workerId = searchParams.get("workerId") || "";
   const assignmentId = searchParams.get("assignmentId") || "";
@@ -69,6 +71,11 @@ export function TaskPageContent() {
       if (!response.ok) {
         setError(data.error || "Submission failed");
         return;
+      }
+
+      // グループ情報を設定
+      if (data.groupInfo) {
+        setGroupInfo(data.groupInfo);
       }
 
       // 警告がある場合（類似度が高い場合）の処理
@@ -129,6 +136,8 @@ export function TaskPageContent() {
   }
 
   if (hasSubmitted && completionCode) {
+    const groupMessage = groupInfo ? getGroupMessage(groupInfo) : null;
+
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <Card className="max-w-md border-green-200 bg-green-50">
@@ -140,6 +149,32 @@ export function TaskPageContent() {
             <p className="text-slate-700 leading-relaxed">
               Your caption has been submitted successfully.
             </p>
+
+            {/* グループメッセージ */}
+            {groupMessage && (
+              <div
+                className={`border rounded-lg p-4 ${
+                  groupMessage.color === "blue"
+                    ? "bg-blue-50 border-blue-200"
+                    : groupMessage.color === "green"
+                    ? "bg-green-50 border-green-200"
+                    : groupMessage.color === "purple"
+                    ? "bg-purple-50 border-purple-200"
+                    : groupMessage.color === "orange"
+                    ? "bg-orange-50 border-orange-200"
+                    : "bg-gray-50 border-gray-200"
+                }`}
+              >
+                <h3 className="font-semibold text-slate-900 mb-2">
+                  {groupMessage.title}
+                </h3>
+                <p className="text-sm text-slate-700">{groupMessage.message}</p>
+                <p className="text-xs text-slate-500 mt-2">
+                  参加者番号: {groupInfo?.participantOrder}
+                </p>
+              </div>
+            )}
+
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-2">
                 Your completion code:
