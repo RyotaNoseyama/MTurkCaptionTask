@@ -169,9 +169,6 @@ export function TaskPageContent() {
                   {groupMessage.title}
                 </h3>
                 <p className="text-sm text-slate-700">{groupMessage.message}</p>
-                <p className="text-xs text-slate-500 mt-2">
-                  参加者番号: {groupInfo?.participantOrder}
-                </p>
               </div>
             )}
 
