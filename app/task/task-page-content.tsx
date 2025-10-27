@@ -12,8 +12,8 @@ import { HistogramData, GoalData } from "@/lib/feedback-data";
 import { GroupInfo, getGroupMessage } from "@/lib/group-utils";
 
 interface FeedbackDataResponse {
-  histogram: HistogramData;
-  goal: GoalData;
+  histogram: HistogramData | null;
+  goal: GoalData | null;
 }
 
 export function TaskPageContent() {
@@ -234,12 +234,13 @@ export function TaskPageContent() {
           </div>
 
           <div className="lg:col-span-1">
-            {feedbackData && (
+            {/* フィードバックパネルをコメントアウト */}
+            {/* {feedbackData && feedbackData.histogram && feedbackData.goal && (
               <FeedbackPanel
                 histogram={feedbackData.histogram}
                 goal={feedbackData.goal}
               />
-            )}
+            )} */}
           </div>
         </div>
       </div>

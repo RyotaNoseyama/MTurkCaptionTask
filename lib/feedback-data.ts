@@ -12,9 +12,25 @@ export interface GoalData {
   threshold: number;
 }
 
+export function isFirstDay(): boolean {
+  // 実験開始日のday_idxを設定
+  // この値は test-day-idx.js を実行して、実験開始日の day_idx に更新してください
+  // const EXPERIMENT_START_DAY_IDX = 19997; // TODO: 実際の実験開始日に合わせて調整
+  // const currentDayIdx = getCurrentDayIdx();
+  // return currentDayIdx === EXPERIMENT_START_DAY_IDX;
+
+  // とりあえず初日判定を無効化（常にfalseを返す）
+  return false;
+}
+
 export async function getYesterdayHistogram(
   workerId: string
-): Promise<HistogramData> {
+): Promise<HistogramData | null> {
+  // 初日の場合はnullを返す
+  if (isFirstDay()) {
+    return null;
+  }
+
   const yesterdayIdx = getCurrentDayIdx() - 1;
 
   const scoresRaw = await prisma.$queryRaw<{ score: number; count: bigint }[]>`
@@ -49,7 +65,12 @@ export async function getYesterdayHistogram(
   return { bins, workerScore };
 }
 
-export async function getYesterdayGoalProgress(): Promise<GoalData> {
+export async function getYesterdayGoalProgress(): Promise<GoalData | null> {
+  // 初日の場合はnullを返す
+  if (isFirstDay()) {
+    return null;
+  }
+
   const todayIdx = getCurrentDayIdx();
   const target = parseInt(process.env.GOAL_TARGET || "50", 10);
   const threshold = parseInt(process.env.GOAL_THRESHOLD || "7", 10);
