@@ -87,7 +87,7 @@ export function CaptionForm({
                   isValidLength(caption) ? "text-green-600" : "text-slate-500"
                 }`}
               >
-                {countNonWhitespaceCharacters(caption)} / {MIN_LENGTH} min
+                {countNonWhitespaceCharacters(caption)} / {MIN_LENGTH} chars
               </span>
             </div>
             <Textarea
