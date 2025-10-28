@@ -39,6 +39,7 @@ export function TaskPageContent() {
       try {
         const response = await fetch(`/api/feedback?workerId=${workerId}`);
         const data = await response.json();
+        console.log("Frontend received feedback data:", data);
         setFeedbackData(data);
       } catch (err) {
         console.error("Failed to load feedback:", err);
@@ -231,12 +232,15 @@ export function TaskPageContent() {
           </div>
 
           <div className="lg:col-span-1">
-            {feedbackData && feedbackData.histogram && feedbackData.goal && (
-              <FeedbackPanel
-                histogram={feedbackData.histogram}
-                goal={feedbackData.goal}
-              />
-            )}
+            <div className="sticky top-8">
+              {feedbackData &&
+                (feedbackData.histogram || feedbackData.goal) && (
+                  <FeedbackPanel
+                    histogram={feedbackData.histogram}
+                    goal={feedbackData.goal}
+                  />
+                )}
+            </div>
           </div>
         </div>
       </div>
