@@ -1,20 +1,37 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HistogramChart } from "./histogram-chart";
 import { HistogramData, GoalData } from "@/lib/feedback-data";
+import {
+  shouldShowGroupGoals,
+  shouldShowIndividualRanking,
+} from "@/lib/group-utils";
 
 interface FeedbackPanelProps {
   histogram: HistogramData | null;
   goal: GoalData | null;
+  cond: number; // グループ条件を追加
 }
 
-export function FeedbackPanel({ histogram, goal }: FeedbackPanelProps) {
+export function FeedbackPanel({ histogram, goal, cond }: FeedbackPanelProps) {
   const progressPercent = goal
     ? Math.min((goal.current / goal.target) * 100, 100)
     : 0;
 
+  console.log("FeedbackPanel - cond:", cond);
+  console.log("FeedbackPanel - histogram:", histogram);
+  console.log("FeedbackPanel - goal:", goal);
+
+  // グループ条件に基づいて表示・非表示を制御
+  const showGroupGoals = shouldShowGroupGoals(cond);
+  const showIndividualRanking = shouldShowIndividualRanking(cond);
+
+  console.log("FeedbackPanel - showGroupGoals:", showGroupGoals);
+  console.log("FeedbackPanel - showIndividualRanking:", showIndividualRanking);
+
   return (
     <div className="space-y-6">
-      {goal && (
+      {/* グループ目標の表示・非表示 */}
+      {goal && showGroupGoals && (
         <Card className="border-slate-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold text-slate-900">
@@ -39,7 +56,8 @@ export function FeedbackPanel({ histogram, goal }: FeedbackPanelProps) {
         </Card>
       )}
 
-      {histogram && (
+      {/* 個人ランキング（ヒストグラム）の表示・非表示 */}
+      {histogram && showIndividualRanking && (
         <Card className="border-slate-200">
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-semibold text-slate-900">

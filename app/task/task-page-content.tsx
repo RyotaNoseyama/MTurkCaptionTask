@@ -9,11 +9,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import { HistogramData, GoalData } from "@/lib/feedback-data";
-import { GroupInfo, getGroupMessage } from "@/lib/group-utils";
+import {
+  GroupInfo,
+  getGroupMessage,
+  shouldShowAnyFeedback,
+} from "@/lib/group-utils";
 
 interface FeedbackDataResponse {
   histogram: HistogramData | null;
   goal: GoalData | null;
+  groupInfo: GroupInfo | null;
 }
 
 export function TaskPageContent() {
@@ -41,6 +46,11 @@ export function TaskPageContent() {
         const data = await response.json();
         console.log("Frontend received feedback data:", data);
         setFeedbackData(data);
+
+        // フィードバックAPIからgroupInfoを取得
+        if (data.groupInfo) {
+          setGroupInfo(data.groupInfo);
+        }
       } catch (err) {
         console.error("Failed to load feedback:", err);
       }
@@ -233,13 +243,29 @@ export function TaskPageContent() {
 
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              {feedbackData &&
-                (feedbackData.histogram || feedbackData.goal) && (
-                  <FeedbackPanel
-                    histogram={feedbackData.histogram}
-                    goal={feedbackData.goal}
-                  />
-                )}
+              {(() => {
+                console.log("TaskPageContent - feedbackData:", feedbackData);
+                console.log("TaskPageContent - groupInfo:", groupInfo);
+                console.log(
+                  "TaskPageContent - shouldShowAnyFeedback:",
+                  groupInfo
+                    ? shouldShowAnyFeedback(groupInfo.cond)
+                    : "no groupInfo"
+                );
+
+                return (
+                  feedbackData &&
+                  (feedbackData.histogram || feedbackData.goal) &&
+                  groupInfo &&
+                  shouldShowAnyFeedback(groupInfo.cond) && (
+                    <FeedbackPanel
+                      histogram={feedbackData.histogram}
+                      goal={feedbackData.goal}
+                      cond={groupInfo.cond}
+                    />
+                  )
+                );
+              })()}
             </div>
           </div>
         </div>
