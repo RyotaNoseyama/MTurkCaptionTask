@@ -162,7 +162,7 @@ export function TaskPageContent() {
             </p>
 
             {/* グループメッセージ */}
-            {groupMessage && (
+            {/* {groupMessage && (
               <div
                 className={`border rounded-lg p-4 ${
                   groupMessage.color === "blue"
@@ -181,7 +181,7 @@ export function TaskPageContent() {
                 </h3>
                 <p className="text-sm text-slate-700">{groupMessage.message}</p>
               </div>
-            )}
+            )} */}
 
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-2">
