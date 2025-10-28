@@ -123,7 +123,7 @@ export async function getYesterdayGoalProgress(
 
   const workerCond = workerResult[0].cond;
   const todayIdx = getCurrentDayIdx();
-  const target = parseInt(process.env.GOAL_TARGET || "50", 10);
+  const target = parseInt(process.env.GOAL_TARGET || "80", 10);
   const threshold = parseInt(process.env.GOAL_THRESHOLD || "7", 10);
 
   console.log(
