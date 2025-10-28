@@ -231,13 +231,12 @@ export function TaskPageContent() {
           </div>
 
           <div className="lg:col-span-1">
-            {/* フィードバックパネルをコメントアウト */}
-            {/* {feedbackData && feedbackData.histogram && feedbackData.goal && (
+            {feedbackData && feedbackData.histogram && feedbackData.goal && (
               <FeedbackPanel
                 histogram={feedbackData.histogram}
                 goal={feedbackData.goal}
               />
-            )} */}
+            )}
           </div>
         </div>
       </div>
