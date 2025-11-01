@@ -75,9 +75,9 @@ export function generateCompletionCode(): string {
     })
     .join("-");
 
-  // 真ん中の文字（7文字目、ハイフンを含めると8文字目）を'A'に固定
+  // 真ん中の文字（7文字目、ハイフンを含めると8文字目）を'N'に固定
   const codeArray = code.split("");
-  codeArray[6] = "A"; // XXXX-XXAX-XXXX の A
+  codeArray[6] = "N"; // XXXX-XXNX-XXXX の N
 
   return `COMP-${codeArray.join("")}`;
 }
