@@ -75,9 +75,9 @@ export function generateCompletionCode(): string {
     })
     .join("-");
 
-  // 真ん中の文字（7文字目、ハイフンを含めると8文字目）を'N'に固定
+  // 真ん中の文字（7文字目、ハイフンを含めると8文字目）を'O'に固定
   const codeArray = code.split("");
-  codeArray[6] = "N"; // XXXX-XXNX-XXXX の N
+  codeArray[6] = "O"; // XXXX-XXOX-XXXX の O
 
   return `COMP-${codeArray.join("")}`;
 }
