@@ -13,13 +13,7 @@ export interface GoalData {
 }
 
 export function isFirstDay(): boolean {
-  // 実験開始日のday_idxを設定
-  // この値は test-day-idx.js を実行して、実験開始日の day_idx に更新してください
-  // const EXPERIMENT_START_DAY_IDX = 19997; // TODO: 実際の実験開始日に合わせて調整
-  // const currentDayIdx = getCurrentDayIdx();
-  // return currentDayIdx === EXPERIMENT_START_DAY_IDX;
-
-  // とりあえず初日判定を無効化（常にfalseを返す）
+  // 固定で day_idx=20387 のフィードバックを表示するため、初日判定を無効化
   return false;
 }
 
@@ -34,8 +28,9 @@ export async function getYesterdayHistogram(
     return null;
   }
 
-  const yesterdayIdx = getCurrentDayIdx() - 1;
-  console.log("Yesterday idx:", yesterdayIdx);
+  // 固定でday_idx=20387のデータを取得
+  const yesterdayIdx = 20387;
+  console.log("Fixed yesterday idx:", yesterdayIdx);
 
   // まず、このworkerのcondを取得
   const workerResult = await prisma.$queryRaw<{ cond: number | null }[]>`
@@ -122,14 +117,15 @@ export async function getYesterdayGoalProgress(
   }
 
   const workerCond = workerResult[0].cond;
-  const todayIdx = getCurrentDayIdx();
+  // 固定でday_idx=20388として、20387以下のデータをカウント
+  const todayIdx = 20388;
   const target = parseInt(process.env.GOAL_TARGET || "80", 10);
   const threshold = parseInt(process.env.GOAL_THRESHOLD || "7", 10);
 
   console.log(
     "Worker cond:",
     workerCond,
-    "todayIdx:",
+    "fixed todayIdx:",
     todayIdx,
     "target:",
     target,
